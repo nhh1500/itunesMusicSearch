@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 class SearchModelCtr extends GetxController {
+  //mode can be song / album / artist
   String _mode = 'Song';
   String get mode => _mode;
 

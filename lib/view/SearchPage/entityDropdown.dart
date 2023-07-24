@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/viewModel/searchModeCtr.dart';
 
+///dropdown button to choose either song,artist, or album to search
 class EntityDropDown extends StatefulWidget {
   const EntityDropDown({
     super.key,

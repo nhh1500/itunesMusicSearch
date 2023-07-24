@@ -14,7 +14,9 @@ class PlayListPage extends StatefulWidget {
 }
 
 class _PlayListPageState extends State<PlayListPage> {
+  //playlist view model
   PlayListHeaderVM vm = Get.find<PlayListHeaderVM>();
+  //all playlists
   List playlist = [];
   Future? future;
   TextEditingController textController = TextEditingController();
@@ -31,6 +33,7 @@ class _PlayListPageState extends State<PlayListPage> {
     future = refresh();
   }
 
+  //read all playlists in database and refresh
   Future refresh() async {
     playlist = await vm.readAll();
     setState(() {});
@@ -42,6 +45,7 @@ class _PlayListPageState extends State<PlayListPage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           actions: [
+            //add new playlist
             IconButton(onPressed: _showMyDialog, icon: const Icon(Icons.add))
           ],
         ),
@@ -70,6 +74,7 @@ class _PlayListPageState extends State<PlayListPage> {
     }
   }
 
+  //show playlist name
   Widget listItem(PlayListHeader header) {
     return ListTile(
       onTap: () async {
@@ -84,6 +89,7 @@ class _PlayListPageState extends State<PlayListPage> {
     );
   }
 
+  //empty playlists
   Widget emptyPlayList() {
     return Center(
       child: Column(
@@ -104,6 +110,7 @@ class _PlayListPageState extends State<PlayListPage> {
     );
   }
 
+  //dialog to create new playlist
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,
@@ -128,6 +135,7 @@ class _PlayListPageState extends State<PlayListPage> {
               child: const Text('Create'),
               onPressed: () async {
                 if (textController.text == '') return;
+                //add playlist name to database
                 var plh = PlayListHeader(listName: textController.text);
                 await vm.create(plh);
                 await refresh();

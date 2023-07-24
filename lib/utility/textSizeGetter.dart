@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+///class to get text size before rendering
 class TextSizeGetter {
   static Size textSize(String text, TextStyle style) {
     final TextPainter textPainter = TextPainter(

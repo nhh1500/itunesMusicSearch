@@ -24,13 +24,16 @@ class _ArtistItemState extends State<ArtistItem> {
     future = getArtistDetail();
   }
 
+  //fetch artist info
   Future<bool> getArtistDetail() async {
+    //extract artist image URL from HTML page
     var response = await ApiHandler.getAPI(
         'https://music.apple.com/de/artist/${widget.artist.artistId.toString()}');
     RegExp regEx = RegExp("<meta property=\"og:image\" content=\"(.*png)\"");
     RegExpMatch? match = regEx.firstMatch(response);
     if (match != null) {
       String rawImageUrl = match.group(1) ?? '';
+      //convert size 100x100 image to 300x300
       String imageUrl = rawImageUrl.replaceAll(
           RegExp(r'[\d]+x[\d]+(cw)+'), '${300}x${300}cc');
       widget.artist.artworkUrl300 = imageUrl;
@@ -62,6 +65,7 @@ class _ArtistItemState extends State<ArtistItem> {
               ));
   }
 
+  //show artist image in gridview mode
   Widget gridImage() {
     return ClipOval(
       child: LayoutBuilder(
@@ -87,6 +91,7 @@ class _ArtistItemState extends State<ArtistItem> {
     );
   }
 
+  //show artist image in listview mode
   Widget imageWidget() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -137,6 +142,7 @@ class _ArtistItemState extends State<ArtistItem> {
     );
   }
 
+  //show artist name and artistType
   Widget mediaInfo(ViewMode mode) {
     return Expanded(
         child: Container(

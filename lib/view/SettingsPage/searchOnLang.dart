@@ -10,6 +10,7 @@ class SearchOnLangPage extends StatefulWidget {
   State<SearchOnLangPage> createState() => _SearchOnLangPageState();
 }
 
+/// choose which language that the itunes api should return
 class _SearchOnLangPageState extends State<SearchOnLangPage> {
   @override
   Widget build(BuildContext context) {
@@ -62,6 +63,7 @@ class _SearchOnLangPageState extends State<SearchOnLangPage> {
     );
   }
 
+  ///update searchLang sharedPreference value
   Widget isSelected(String value) {
     if (Get.find<UserConfig>().searchLang == value) {
       return const Icon(

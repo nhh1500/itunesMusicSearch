@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
+/// Widget to LoudnessEnhancer
 class LoudnessEnhancerControls extends StatelessWidget {
   final AndroidLoudnessEnhancer loudnessEnhancer;
 

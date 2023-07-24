@@ -7,7 +7,7 @@ import 'package:itunes_music/view/playList/playListPage.dart';
 import 'package:itunes_music/view/SettingsPage/settingsPage.dart';
 import 'package:itunes_music/viewModel/playListHeaderVM.dart';
 
-/// side menu
+/// side menu used by searchPage
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 

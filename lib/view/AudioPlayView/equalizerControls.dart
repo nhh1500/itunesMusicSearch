@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
+/// Widget to control equalizer
 class EqualizerControls extends StatelessWidget {
   final AndroidEqualizer equalizer;
 

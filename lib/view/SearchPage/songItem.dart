@@ -4,6 +4,7 @@ import 'package:itunes_music/model/song.dart';
 import 'package:itunes_music/viewModel/viewModeCtr.dart';
 import 'package:itunes_music/view/SongPage/songPage.dart';
 
+///song Item widget show in resultView
 class SongItem extends StatefulWidget {
   final Song song;
   const SongItem({super.key, required this.song});
@@ -36,6 +37,7 @@ class _SongItemState extends State<SongItem> {
                   )));
   }
 
+  //show image
   Widget imageWidget() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -46,8 +48,8 @@ class _SongItemState extends State<SongItem> {
           return Container(
             width: 60,
             height: 60,
-            padding: EdgeInsets.all(10),
-            child: Icon(Icons.error),
+            padding: const EdgeInsets.all(10),
+            child: const Icon(Icons.error),
           );
         },
         loadingBuilder: (context, child, loadingProgress) {
@@ -70,6 +72,7 @@ class _SongItemState extends State<SongItem> {
     );
   }
 
+  //show artist and song name
   Widget mediaInfo(ViewMode mode) {
     return Expanded(
         child: Container(

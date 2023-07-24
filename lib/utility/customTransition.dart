@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+///custom animation when toggle gridview and listview
 class CustomTransitions extends MaterialRectCenterArcTween {
   CustomTransitions({required this.a, required this.b})
       : super(begin: a, end: b);

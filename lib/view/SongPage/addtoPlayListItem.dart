@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:itunes_music/model/playListBody.dart';
 import 'package:itunes_music/viewModel/playlistbdyVM.dart';
 
+///single playList allow user to select and diselect song from playList
 class AddToPlayListItem extends StatefulWidget {
   final Function() refresh;
   final String listName;
@@ -21,7 +22,11 @@ class AddToPlayListItem extends StatefulWidget {
 
 class _AddToPlayListItemState extends State<AddToPlayListItem> {
   Future? init;
+
+  /// hold all songs in the playList
   List<PlayListBody> list = [];
+
+  /// playList view model
   var plbdyvm = Get.find<PlayListbdyVM>();
 
   @override
@@ -58,6 +63,7 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
     );
   }
 
+  ///checkbox event
   void onChange(bool? check) async {
     if (check!) {
       await createRecord();
@@ -68,6 +74,7 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
     }
   }
 
+  ///create record if user select this song
   Future createRecord() async {
     int availableIndex = await findAvailableIndex();
     await plbdyvm.create(PlayListBody(
@@ -76,10 +83,12 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
         songId: widget.songId));
   }
 
+  ///delete record if user diselected this song from playList
   Future deleteRecord() async {
     return await plbdyvm.delete(widget.headerId, widget.songId);
   }
 
+  ///find available Index in database
   Future<int> findAvailableIndex() async {
     int availableIndex = 0;
 

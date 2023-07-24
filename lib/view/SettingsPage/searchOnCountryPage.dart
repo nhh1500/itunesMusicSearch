@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 
+/// choose which country itunes store should the itunes api fetch data
 class SearchOnCountryPage extends StatefulWidget {
   const SearchOnCountryPage({super.key});
 
@@ -57,6 +58,7 @@ class _SearchOnCountryPageState extends State<SearchOnCountryPage> {
     );
   }
 
+  ///update sharedpreference value
   Widget isSelected(String value) {
     if (Get.find<UserConfig>().searchCountry == value) {
       return const Icon(

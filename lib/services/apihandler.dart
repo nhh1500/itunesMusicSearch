@@ -6,13 +6,19 @@ import 'package:itunes_music/services/statusCode.dart';
 
 import '../utility/alertMessageBox.dart';
 
+/// controller to request http post / get / put / delete
 class ApiHandler {
   static Future<dynamic> postAPI(String url, dynamic data) async {
     if (data is Map<String, dynamic>) {
       data = jsonEncode(data);
     } else if (data is FormData) {}
     try {
-      var response = await Dio().post(url, data: data, options: Options());
+      var response = await Dio().post(url,
+          data: data,
+          options: Options(sendTimeout: const Duration(seconds: 5)));
+      if (response.data == "Connection timed out") {
+        return AlertMessageBox.show('Timeout', '');
+      }
       return response.data;
     } catch (e) {
       if (e is DioException) {

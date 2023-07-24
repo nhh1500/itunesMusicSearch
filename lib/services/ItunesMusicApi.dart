@@ -1,5 +1,6 @@
 import 'package:itunes_music/services/apihandler.dart';
 
+/// controller to fetch data from Itunes
 class ItunesMusicApi {
   static const String base = 'itunes.apple.com';
 
@@ -95,6 +96,7 @@ class ItunesMusicApi {
     return response;
   }
 
+  ///lookup multiple music
   Future<dynamic> lookupMutliple(List<int> idList,
       {String? entity,
       String? attribute,
@@ -102,7 +104,7 @@ class ItunesMusicApi {
       String? country,
       int? limit = 200}) async {
     String endpoint = 'lookup';
-    final Map<String, String> queryParameter = {'id': idList.join(',')};
+    final Map<String, dynamic> queryParameter = {'id': idList.join(',')};
     if (entity != null) {
       queryParameter.addAll({'entity': entity});
     }
@@ -118,7 +120,9 @@ class ItunesMusicApi {
     if (limit != null) {
       queryParameter.addAll({'limit': limit.toString()});
     }
-    String url = Uri.https(base, endpoint, queryParameter).toString();
+    String url = Uri.https(base, endpoint, queryParameter)
+        .toString()
+        .replaceAll(RegExp(r'%2C'), ',');
     print('api send $url');
     String encodeUrl = Uri.encodeFull(url);
 

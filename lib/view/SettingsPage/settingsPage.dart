@@ -3,11 +3,13 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/utility/sharedPrefs.dart';
+import 'package:itunes_music/utility/toastMessage.dart';
 import 'package:itunes_music/view/SettingsPage/languagePage.dart';
 import 'package:itunes_music/view/SettingsPage/searchOnCountryPage.dart';
 import 'package:itunes_music/view/SettingsPage/searchOnLang.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 
+///settings page
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -40,13 +42,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget commonSection() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(left: 20, bottom: 5),
+            padding: const EdgeInsets.only(left: 20, bottom: 5),
             child: Text('General'.tr),
           ),
           Container(
@@ -58,23 +60,23 @@ class _SettingsPageState extends State<SettingsPage> {
               children: [
                 ListTile(
                   onTap: () {
-                    Get.to(LanguagePage());
+                    Get.to(const LanguagePage());
                   },
-                  leading: Icon(Icons.language),
+                  leading: const Icon(Icons.language),
                   title: Text('Language'.tr),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(Get.locale.toString().tr),
-                      Icon(Icons.arrow_forward_ios)
+                      const Icon(Icons.arrow_forward_ios)
                     ],
                   ),
                 ),
                 ListTile(
                   onTap: () {},
-                  leading: Icon(Icons.color_lens),
+                  leading: const Icon(Icons.color_lens),
                   title: Text('Theme'.tr),
-                  trailing: Icon(Icons.arrow_forward_ios),
+                  trailing: const Icon(Icons.arrow_forward_ios),
                 ),
                 ListTile(
                   onTap: () {
@@ -102,13 +104,13 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget playbackSection() {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(left: 20, bottom: 5),
+            padding: const EdgeInsets.only(left: 20, bottom: 5),
             child: Text('Playback'.tr),
           ),
           Container(
@@ -119,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: Icon(Icons.play_circle),
+                  leading: const Icon(Icons.play_circle),
                   title: Text('Autoplay'.tr),
                   trailing: Switch(
                     activeTrackColor: Colors.green,
@@ -136,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 ListTile(
                   onTap: () {},
-                  leading: Icon(Icons.remember_me),
+                  leading: const Icon(Icons.remember_me),
                   title: Text('Resume playback'.tr),
                   trailing: Switch(
                     activeTrackColor: Colors.green,
@@ -234,13 +236,16 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // ListTile(
+                //   onTap: () {},
+                //   leading: const Icon(Icons.delete),
+                //   title: Text('Clear cache'.tr),
+                // ),
                 ListTile(
-                  onTap: () {},
-                  leading: const Icon(Icons.delete),
-                  title: Text('Clear cache'.tr),
-                ),
-                ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    config.searchHistoryClear();
+                    ToastMessage.displayFloast('success');
+                  },
                   leading: const Icon(Icons.history),
                   title: Text('Clear search history'.tr),
                 ),

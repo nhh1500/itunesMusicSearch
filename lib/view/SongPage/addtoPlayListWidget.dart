@@ -4,6 +4,7 @@ import '../../model/playListHeader.dart';
 import '../../viewModel/playListHeaderVM.dart';
 import 'addtoPlayListItem.dart';
 
+/// playList widget allow user to add song to playList
 class AddToPlayListWidget extends StatefulWidget {
   final int songId;
   const AddToPlayListWidget({super.key, required this.songId});
@@ -18,6 +19,7 @@ class _AddToPlayListWidgetState extends State<AddToPlayListWidget> {
   List<PlayListHeader> playlists = [];
 
   Future refresh() async {
+    //read all playList from database and refresh widget
     playlists = await plhvm.readAll();
     setState(() {});
   }
@@ -44,6 +46,7 @@ class _AddToPlayListWidgetState extends State<AddToPlayListWidget> {
     );
   }
 
+  //show all playLists
   Widget listPlaylist() {
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,

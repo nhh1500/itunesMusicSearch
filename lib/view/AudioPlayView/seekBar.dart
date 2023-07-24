@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+///seek bar to control audio position
 class SeekBar extends StatefulWidget {
   final Duration duration;
   final Duration position;
@@ -42,8 +43,8 @@ class SeekBarState extends State<SeekBar> {
         SliderTheme(
           data: _sliderThemeData.copyWith(
             thumbShape: HiddenThumbComponentShape(),
-            activeTrackColor: Color.fromARGB(255, 194, 33, 33),
-            inactiveTrackColor: Color.fromARGB(255, 14, 196, 78),
+            activeTrackColor: const Color.fromARGB(255, 194, 33, 33),
+            inactiveTrackColor: const Color.fromARGB(255, 14, 196, 78),
           ),
           child: ExcludeSemantics(
             child: Slider(

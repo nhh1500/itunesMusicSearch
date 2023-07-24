@@ -3,14 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/services/ApiController.dart';
+import 'package:itunes_music/view/SongPage/songPage.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../model/album.dart';
 import '../../model/song.dart';
-import '../../viewModel/audioPlayer.dart';
 
+///album Page
 class AlbumPage extends StatefulWidget {
   final Album album;
   const AlbumPage({super.key, required this.album});
@@ -19,41 +20,22 @@ class AlbumPage extends StatefulWidget {
   State<AlbumPage> createState() => _AlbumPageState();
 }
 
-class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
-  late AudioPlayerVM player;
+class _AlbumPageState extends State<AlbumPage> {
+  ///hold all songs for this album
   List<Song> songs = [];
   Future? future;
 
   @override
   void initState() {
     super.initState();
-    player = Get.find<AudioPlayerVM>();
-    WidgetsBinding.instance.addObserver(this);
     future = init();
   }
 
   Future init() async {
-    await player.init();
     await getAlbumDetail();
-    await player.setPlayList(songs);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.paused) {
-      // Release the player's resources when not in use. We use "stop" so that
-      // if the app resumes later, it will still remember what position to
-      // resume from.
-      await player.stop();
-    }
-  }
-
+  ///fetch all songs from album
   Future getAlbumDetail() async {
     songs.clear();
     var vm = Get.find<UserConfig>();
@@ -73,26 +55,22 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        child: Scaffold(
-            appBar: AppBar(
-              title: TextScroll(
-                widget.album.collectionName.toString(),
-                intervalSpaces: 5,
-                delayBefore: Duration(seconds: 2),
-                pauseBetween: Duration(seconds: 2),
-                fadedBorder: true,
-                fadeBorderSide: FadeBorderSide.right,
-                fadeBorderVisibility: FadeBorderVisibility.auto,
-                velocity: const Velocity(pixelsPerSecond: Offset(50, 0)),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            ),
-            body: body()),
-        onWillPop: () async {
-          await player.stop();
-          return true;
-        });
+    return Scaffold(
+        appBar: AppBar(
+          //album name
+          title: TextScroll(
+            widget.album.collectionName.toString(),
+            intervalSpaces: 5,
+            delayBefore: const Duration(seconds: 2),
+            pauseBetween: const Duration(seconds: 2),
+            fadedBorder: true,
+            fadeBorderSide: FadeBorderSide.right,
+            fadeBorderVisibility: FadeBorderVisibility.auto,
+            velocity: const Velocity(pixelsPerSecond: Offset(50, 0)),
+          ),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: body());
   }
 
   Widget body() {
@@ -107,17 +85,9 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return SingleChildScrollView(
-            child: StreamBuilder<SequenceState?>(
-              stream: player.sequenceStateStream,
-              builder: (context, snapshot) {
-                final currentIndex = snapshot.data?.currentIndex;
-                return Column(
-                    children: List.generate(
-                        songs.length,
-                        (index) =>
-                            songTile(songs[index], index, currentIndex ?? 0)));
-              },
-            ),
+            child: Column(
+                children: List.generate(
+                    songs.length, (index) => songTile(songs[index], index))),
           );
         } else {
           return Container();
@@ -126,6 +96,7 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
     );
   }
 
+  ///album info
   Widget header() {
     return SizedBox(
       height: 150,
@@ -156,63 +127,27 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
     );
   }
 
+  ///play button
   Widget controlButton() {
     return Positioned(
         right: 10,
         bottom: 5,
-        child: StreamBuilder<PlayerState>(
-          stream: player.playerStateStream,
-          builder: (context, snapshot) {
-            final playerState = snapshot.data;
-            final processingState = playerState?.processingState;
-            final playing = playerState?.playing;
-            if (processingState == ProcessingState.loading ||
-                processingState == ProcessingState.buffering) {
-              return CircleAvatar(
-                backgroundColor: Colors.red,
-                child: Icon(
-                  Icons.play_arrow,
-                  color: Colors.white,
-                ),
-              );
-            } else if (playing != true) {
-              return GestureDetector(
-                onTap: () => player.play(),
-                child: CircleAvatar(
-                  backgroundColor: Colors.red,
-                  child: Icon(
-                    Icons.play_arrow,
-                    color: Colors.white,
-                  ),
-                ),
-              );
-            } else if (processingState != ProcessingState.completed) {
-              return GestureDetector(
-                onTap: () => player.pause(),
-                child: CircleAvatar(
-                  backgroundColor: Colors.red,
-                  child: Icon(
-                    Icons.pause,
-                    color: Colors.white,
-                  ),
-                ),
-              );
-            } else {
-              return GestureDetector(
-                onTap: () => player.seek(Duration.zero, index: 0),
-                child: CircleAvatar(
-                  backgroundColor: Colors.red,
-                  child: Icon(
-                    Icons.replay,
-                    color: Colors.white,
-                  ),
-                ),
-              );
-            }
-          },
+        child: GestureDetector(
+          onTap: () => Get.to(SongPage(
+            songs: songs,
+            listIndex: 0,
+          )),
+          child: CircleAvatar(
+            backgroundColor: Colors.red,
+            child: Icon(
+              Icons.play_arrow,
+              color: Colors.white,
+            ),
+          ),
         ));
   }
 
+  ///show album name, artist name, genre, release date
   Widget albumInfo() {
     return Expanded(
         child: Container(
@@ -242,7 +177,8 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
     ));
   }
 
-  Widget songTile(Song song, int index, int currentIndex) {
+  ///song widget
+  Widget songTile(Song song, int index) {
     Duration duration = Duration(milliseconds: song.trackTimeMillis!);
     final hh = (duration.inHours).toString();
     String mm = (duration.inMinutes % 60).toString();
@@ -260,8 +196,10 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
         if (snapshot.connectionState == ConnectionState.done) {
           return GestureDetector(
             onTap: () async {
-              await player.seek(Duration.zero, index: index);
-              await player.play();
+              Get.to(SongPage(
+                songs: songs,
+                listIndex: index,
+              ));
             },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
@@ -273,25 +211,16 @@ class _AlbumPageState extends State<AlbumPage> with WidgetsBindingObserver {
                     width: 30,
                     child: Text(
                       '${index + 1}',
-                      style: index == currentIndex
-                          ? TextStyle(color: Colors.blue)
-                          : null,
                     ),
                   ),
                   Text(
                     song.trackName.toString(),
-                    style: index == currentIndex
-                        ? TextStyle(color: Colors.blue)
-                        : null,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const Spacer(),
                   Text(
                     mmss,
-                    style: index == currentIndex
-                        ? TextStyle(color: Colors.blue)
-                        : null,
                   )
                 ],
               ),

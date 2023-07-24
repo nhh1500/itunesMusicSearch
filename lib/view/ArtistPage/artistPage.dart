@@ -12,6 +12,7 @@ import '../../model/album.dart';
 import '../../model/artist.dart';
 import '../../model/song.dart';
 
+///artist Page
 class ArtistPage extends StatefulWidget {
   final Artist artist;
   const ArtistPage({super.key, required this.artist});
@@ -23,7 +24,11 @@ class ArtistPage extends StatefulWidget {
 class _ArtistPageState extends State<ArtistPage> {
   Future? albumFuture;
   Future? songFuture;
+
+  ///hold all songs for the artist
   List<Song> songs = [];
+
+  ///hold all albums for the artist
   List<Album> albums = [];
 
   @override
@@ -33,6 +38,7 @@ class _ArtistPageState extends State<ArtistPage> {
     songFuture = getSong();
   }
 
+  ///fetch all albums for the artist
   Future getAlbum() async {
     albums.clear();
     var vm = Get.find<UserConfig>();
@@ -50,6 +56,7 @@ class _ArtistPageState extends State<ArtistPage> {
     }
   }
 
+  /// fetch all songs for the artist
   Future getSong() async {
     songs.clear();
     var vm = Get.find<UserConfig>();
@@ -71,6 +78,7 @@ class _ArtistPageState extends State<ArtistPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          //auto scroll if artist Name too long
           title: TextScroll(
             widget.artist.artistName.toString(),
             intervalSpaces: 5,
@@ -100,10 +108,11 @@ class _ArtistPageState extends State<ArtistPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    ///artist NAme
                     TextScroll(
                       widget.artist.artistName.toString(),
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20),
                       intervalSpaces: 10,
                       delayBefore: Duration(seconds: 2),
                       pauseBetween: Duration(seconds: 2),
@@ -114,7 +123,7 @@ class _ArtistPageState extends State<ArtistPage> {
                     ),
                     Text(
                       widget.artist.primaryGenreName.toString(),
-                      style: TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     )
                   ],
                 ),
@@ -128,6 +137,7 @@ class _ArtistPageState extends State<ArtistPage> {
         ));
   }
 
+  ///song section to show all songs for the artist
   Widget songSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +164,7 @@ class _ArtistPageState extends State<ArtistPage> {
                           child: Container(
                             color:
                                 index % 2 == 1 ? Colors.grey[50] : Colors.white,
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 vertical: 2, horizontal: 5),
                             child: Row(
                               children: [
@@ -162,7 +172,7 @@ class _ArtistPageState extends State<ArtistPage> {
                                   songs[index].artworkUrl60.toString(),
                                   fit: BoxFit.cover,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 Expanded(
@@ -171,7 +181,7 @@ class _ArtistPageState extends State<ArtistPage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )),
-                                SizedBox(
+                                const SizedBox(
                                   width: 5,
                                 ),
                                 Text(msToMMSS(songs[index].trackTimeMillis!)),
@@ -189,11 +199,12 @@ class _ArtistPageState extends State<ArtistPage> {
     );
   }
 
+  ///show all albums for the artist
   Widget albumSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
+        const Padding(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           child: Text(
             'Albums',
@@ -250,6 +261,7 @@ class _ArtistPageState extends State<ArtistPage> {
     );
   }
 
+  ///divider
   Widget customDivider() {
     return Row(
       children: [
@@ -257,7 +269,7 @@ class _ArtistPageState extends State<ArtistPage> {
           child: SizedBox(
             height: 2,
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   gradient: LinearGradient(
                       colors: [Colors.white, Colors.black],
                       begin: Alignment.centerLeft,
@@ -268,7 +280,7 @@ class _ArtistPageState extends State<ArtistPage> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 2),
           child: Row(
-            children: [
+            children: const [
               Icon(
                 Icons.star,
                 size: 10,
@@ -288,7 +300,7 @@ class _ArtistPageState extends State<ArtistPage> {
           child: SizedBox(
             height: 2,
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   gradient: LinearGradient(
                       colors: [Colors.white, Colors.black],
                       begin: Alignment.centerRight,
@@ -300,6 +312,7 @@ class _ArtistPageState extends State<ArtistPage> {
     );
   }
 
+  //ms to time format MM:SS
   String msToMMSS(int ms) {
     Duration duration = Duration(milliseconds: ms);
     final mm = (duration.inMinutes % 60).toString().padLeft(2, '0');

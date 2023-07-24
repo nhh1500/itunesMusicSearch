@@ -13,6 +13,7 @@ import 'package:itunes_music/view/SearchPage/songItem.dart';
 import '../../model/song.dart';
 import '../../utility/customTransition.dart';
 
+//resultview shows all results from itunes music api
 class ResultView extends StatefulWidget {
   const ResultView({super.key});
 
@@ -37,7 +38,7 @@ class _ResultViewState extends State<ResultView> {
                 itemCount: controller.result.length,
                 itemBuilder: (context, index) {
                   var mediaObject = controller.result[index];
-
+                  //animation when switch to gridview or listview
                   return Hero(
                       tag: index,
                       createRectTween: (Rect? begin, Rect? end) {
@@ -54,6 +55,7 @@ class _ResultViewState extends State<ResultView> {
                 childAspectRatio: modeCtr.viewMode == ViewMode.grid ? 1.1 : 1.3,
                 children: List.generate(controller.result.length, (index) {
                   var mediaObject = controller.result[index];
+                  //animation when switch to gridview or listview
                   return Hero(
                       tag: index,
                       createRectTween: (Rect? begin, Rect? end) {
@@ -68,6 +70,7 @@ class _ResultViewState extends State<ResultView> {
     );
   }
 
+  ///show item based on wrapperType
   Widget returnItem(MediaObject mediaObject) {
     if (mediaObject is Song) {
       return SongItem(

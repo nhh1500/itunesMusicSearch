@@ -12,6 +12,7 @@ import 'package:itunes_music/model/song.dart';
 import 'package:itunes_music/services/ApiController.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 
+///search bar in searchPage
 class SearchTextField extends StatefulWidget {
   const SearchTextField({super.key});
 
@@ -34,8 +35,10 @@ class _SearchTextFieldState extends State<SearchTextField> {
       controller: _controler,
       onSubmitted: (value) async {
         var response;
+        //show loading widget during api call
         EasyLoading.show(status: 'Loading');
         var vm = Get.find<UserConfig>();
+        //call api to search either song, artist, or album
         switch (Get.find<SearchModelCtr>().mode) {
           case 'Song':
             response = await ApiController.itunesMusicApi.search(
@@ -60,23 +63,26 @@ class _SearchTextFieldState extends State<SearchTextField> {
           default:
             break;
         }
+        //dimiss loading widget when api return
         EasyLoading.dismiss();
+        //extract json Data
         updateResultView(response);
       },
       decoration: InputDecoration(
           hintText: 'Search'.tr,
-          contentPadding: EdgeInsets.all(0),
-          border: OutlineInputBorder(
+          contentPadding: const EdgeInsets.all(0),
+          border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(15))),
-          prefixIcon: Icon(Icons.search),
+          prefixIcon: const Icon(Icons.search),
           suffixIcon: IconButton(
               onPressed: () {
                 _controler.clear();
               },
-              icon: Icon(Icons.clear))),
+              icon: const Icon(Icons.clear))),
     );
   }
 
+  ///extract json data
   void updateResultView(dynamic response) {
     try {
       Map json = jsonDecode(response.toString().trim());
@@ -97,6 +103,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
             break;
         }
       }
+      // notify widget that is using SearchResultCtr GetBuilder to refresh
       getxCtr.update();
     } catch (e) {
       print(e.toString());

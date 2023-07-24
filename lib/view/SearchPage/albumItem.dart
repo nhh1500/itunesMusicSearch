@@ -5,6 +5,7 @@ import 'package:itunes_music/view/AlbumPage/albumPage.dart';
 import '../../model/album.dart';
 import '../../viewModel/viewModeCtr.dart';
 
+//album Item
 class AlbumItem extends StatefulWidget {
   final Album album;
   const AlbumItem({super.key, required this.album});
@@ -36,6 +37,7 @@ class _AlbumItemState extends State<AlbumItem> {
                   )));
   }
 
+  //show image
   Widget imageWidget() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -70,6 +72,7 @@ class _AlbumItemState extends State<AlbumItem> {
     );
   }
 
+  //show album and artist name
   Widget mediaInfo(ViewMode mode) {
     return Expanded(
         child: Container(
