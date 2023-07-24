@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/services/ApiController.dart';
@@ -96,8 +97,9 @@ class _ArtistPageState extends State<ArtistPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: Image.network(
-                  widget.artist.artworkUrl300.toString(),
+                child: CachedNetworkImage(
+                  imageUrl: widget.artist.artworkUrl300.toString(),
+                  fadeInDuration: const Duration(milliseconds: 80),
                   width: 300,
                   height: 300,
                 ),
@@ -168,8 +170,11 @@ class _ArtistPageState extends State<ArtistPage> {
                                 vertical: 2, horizontal: 5),
                             child: Row(
                               children: [
-                                Image.network(
-                                  songs[index].artworkUrl60.toString(),
+                                CachedNetworkImage(
+                                  imageUrl:
+                                      songs[index].artworkUrl60.toString(),
+                                  fadeInDuration:
+                                      const Duration(milliseconds: 80),
                                   fit: BoxFit.cover,
                                 ),
                                 const SizedBox(
@@ -231,8 +236,8 @@ class _ArtistPageState extends State<ArtistPage> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Image.network(
-                                    albums[index]
+                                  CachedNetworkImage(
+                                    imageUrl: albums[index]
                                         .artworkUrl100
                                         .toString()
                                         .replaceAll(
@@ -240,6 +245,8 @@ class _ArtistPageState extends State<ArtistPage> {
                                     height: 150,
                                     width: 150,
                                     fit: BoxFit.cover,
+                                    fadeInDuration:
+                                        const Duration(milliseconds: 80),
                                   ),
                                   Text(
                                     albums[index].collectionName.toString(),

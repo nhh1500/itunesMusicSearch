@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/artist.dart';
@@ -73,8 +74,9 @@ class _ArtistItemState extends State<ArtistItem> {
           future: future,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
-              return Image.network(
-                widget.artist.artworkUrl300.toString(),
+              return CachedNetworkImage(
+                imageUrl: widget.artist.artworkUrl300.toString(),
+                fadeInDuration: const Duration(milliseconds: 80),
                 width: p1.maxWidth / 2,
                 height: p1.maxWidth / 2,
               );
@@ -82,7 +84,7 @@ class _ArtistItemState extends State<ArtistItem> {
               return SizedBox(
                 height: p1.maxWidth / 2,
                 width: p1.maxWidth / 2,
-                child: CircularProgressIndicator(),
+                child: const CircularProgressIndicator(),
               );
             }
           },
@@ -99,31 +101,28 @@ class _ArtistItemState extends State<ArtistItem> {
         future: future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Image.network(
-              widget.artist.artworkUrl300.toString(),
+            return CachedNetworkImage(
+              imageUrl: widget.artist.artworkUrl300.toString(),
+              fadeInDuration: const Duration(milliseconds: 80),
               height: 60,
               width: 60,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) {
+              errorWidget: (context, url, error) {
                 return Container(
                   width: 60,
                   height: 60,
-                  padding: EdgeInsets.all(10),
-                  child: Icon(Icons.error),
+                  padding: const EdgeInsets.all(10),
+                  child: const Icon(Icons.error),
                 );
               },
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                }
+              progressIndicatorBuilder: (context, url, progress) {
                 return Container(
                   width: 60,
                   height: 60,
                   padding: const EdgeInsets.all(10),
                   child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
+                    value: progress.progress != null
+                        ? progress.progress! / 1.0
                         : null,
                   ),
                 );

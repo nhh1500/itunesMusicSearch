@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/song.dart';
@@ -41,33 +42,27 @@ class _SongItemState extends State<SongItem> {
   Widget imageWidget() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Image.network(
-        widget.song.artworkUrl60.toString(),
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            width: 60,
-            height: 60,
-            padding: const EdgeInsets.all(10),
-            child: const Icon(Icons.error),
-          );
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
+      child: CachedNetworkImage(
+        imageUrl: widget.song.artworkUrl60.toString(),
+        fadeInDuration: const Duration(milliseconds: 80),
+        progressIndicatorBuilder: (context, url, progress) {
           return Container(
             width: 60,
             height: 60,
             padding: const EdgeInsets.all(10),
             child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
-            ),
+                value: progress.progress != null
+                    ? progress.progress! / 1.0
+                    : null),
           );
         },
+        fit: BoxFit.contain,
+        errorWidget: (context, url, error) => Container(
+          width: 60,
+          height: 60,
+          padding: const EdgeInsets.all(10),
+          child: const Icon(Icons.error),
+        ),
       ),
     );
   }

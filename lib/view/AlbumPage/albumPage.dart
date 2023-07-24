@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/services/ApiController.dart';
@@ -102,8 +103,9 @@ class _AlbumPageState extends State<AlbumPage> {
       height: 150,
       child: Row(
         children: [
-          Image.network(
-            widget.album.artworkUrl100.toString(),
+          CachedNetworkImage(
+            imageUrl: widget.album.artworkUrl100.toString(),
+            fadeInDuration: const Duration(milliseconds: 80),
             fit: BoxFit.cover,
             width: 150,
             height: 150,

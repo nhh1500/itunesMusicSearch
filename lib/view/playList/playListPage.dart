@@ -95,14 +95,14 @@ class _PlayListPageState extends State<PlayListPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Empty',
+          Text(
+            'No Playlist'.tr,
             style: TextStyle(fontSize: 32),
           ),
           ElevatedButton(
               onPressed: _showMyDialog,
-              child: const Text(
-                'Create PlayList',
+              child: Text(
+                'Create Playlist'.tr,
                 style: TextStyle(fontSize: 28),
               ))
         ],
@@ -118,12 +118,12 @@ class _PlayListPageState extends State<PlayListPage> {
       builder: (BuildContext context) {
         textController.clear();
         return AlertDialog(
-          title: const Text('Create PlayList'),
+          title: Text('Create Playlist'.tr),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Playlist Name'),
+                Text('Playlist Name'.tr),
                 TextField(
                   controller: textController,
                 ),
@@ -132,7 +132,7 @@ class _PlayListPageState extends State<PlayListPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Create'),
+              child: Text('Create'.tr),
               onPressed: () async {
                 if (textController.text == '') return;
                 //add playlist name to database

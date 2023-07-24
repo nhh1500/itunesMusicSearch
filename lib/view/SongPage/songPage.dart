@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -195,17 +196,18 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
             return Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.only(
-                      top: 10, left: 30, right: 30, bottom: 30),
-                  height: p1.maxWidth,
-                  width: p1.maxWidth,
-                  child: Image.network(
-                    metadata.artworkUrl100
-                        .toString()
-                        .replaceAll(RegExp('100x100'), '300x300'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                    padding: const EdgeInsets.only(
+                        top: 10, left: 30, right: 30, bottom: 30),
+                    height: p1.maxWidth,
+                    width: p1.maxWidth,
+                    child: CachedNetworkImage(
+                      fadeInDuration: const Duration(milliseconds: 80),
+                      imageUrl: metadata.artworkUrl100.toString().replaceAll(
+                            RegExp('100x100'),
+                            '300x300',
+                          ),
+                      fit: BoxFit.cover,
+                    )),
               ],
             );
           },
