@@ -7,21 +7,16 @@ import '../../model/album.dart';
 import '../../viewModel/viewModeCtr.dart';
 
 //album Item
-class AlbumItem extends StatefulWidget {
+class AlbumItem extends StatelessWidget {
   final Album album;
   const AlbumItem({super.key, required this.album});
 
   @override
-  State<AlbumItem> createState() => _AlbumItemState();
-}
-
-class _AlbumItemState extends State<AlbumItem> {
-  var mode = Get.find<ViewModeCtr>().viewMode;
-  @override
   Widget build(BuildContext context) {
+    var mode = Get.find<ViewModeCtr>().viewMode;
     return GestureDetector(
         onTap: () => Get.to(AlbumPage(
-              album: widget.album,
+              album: album,
             )),
         child: Container(
             margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -43,7 +38,7 @@ class _AlbumItemState extends State<AlbumItem> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: CachedNetworkImage(
-        imageUrl: widget.album.artworkUrl60.toString(),
+        imageUrl: album.artworkUrl60.toString(),
         fadeInDuration: const Duration(milliseconds: 80),
         fit: BoxFit.contain,
         errorWidget: (context, url, error) {
@@ -81,13 +76,13 @@ class _AlbumItemState extends State<AlbumItem> {
               : CrossAxisAlignment.center,
           children: [
             Text(
-              widget.album.collectionName.toString(),
+              album.collectionName.toString(),
               maxLines: 1,
               overflow: TextOverflow.fade,
               softWrap: false,
             ),
             Text(
-              widget.album.artistName.toString(),
+              album.artistName.toString(),
               maxLines: 1,
               overflow: TextOverflow.fade,
             )

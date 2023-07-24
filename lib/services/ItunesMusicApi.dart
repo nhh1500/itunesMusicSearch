@@ -51,7 +51,7 @@ class ItunesMusicApi {
     }
     String url = Uri.https(base, endpoint, queryParameter).toString();
     String encodeUrl = Uri.encodeFull(url);
-
+    print('api send $encodeUrl');
     var response = await ApiHandler.getAPI(encodeUrl);
     return response;
   }
@@ -89,9 +89,8 @@ class ItunesMusicApi {
       queryParameter.addAll({'limit': limit.toString()});
     }
     String url = Uri.https(base, endpoint, queryParameter).toString();
-    print('api send $url');
     String encodeUrl = Uri.encodeFull(url);
-
+    print('api send $encodeUrl');
     var response = await ApiHandler.getAPI(encodeUrl);
     return response;
   }
@@ -123,10 +122,31 @@ class ItunesMusicApi {
     String url = Uri.https(base, endpoint, queryParameter)
         .toString()
         .replaceAll(RegExp(r'%2C'), ',');
-    print('api send $url');
-    String encodeUrl = Uri.encodeFull(url);
 
+    String encodeUrl = Uri.encodeFull(url);
+    print('api send $encodeUrl');
     var response = await ApiHandler.getAPI(encodeUrl);
     return response;
+  }
+
+  ///extract artist image URL from HTML page
+  Future getArtistImageUrl(int artistID) async {
+    String imageUrl = '';
+    String url = 'https://music.apple.com/de/artist/${artistID.toString()}';
+    print('api send $url');
+    try {
+      var response = await ApiHandler.getAPI(url);
+      RegExp regEx = RegExp("<meta property=\"og:image\" content=\"(.*png)\"");
+      RegExpMatch? match = regEx.firstMatch(response);
+      if (match != null) {
+        String rawImageUrl = match.group(1) ?? '';
+        //convert size 100x100 image to 300x300
+        imageUrl = rawImageUrl.replaceAll(
+            RegExp(r'[\d]+x[\d]+(cw)+'), '${300}x${300}cc');
+      }
+    } catch (e) {
+      print('error : $e');
+    }
+    return imageUrl;
   }
 }

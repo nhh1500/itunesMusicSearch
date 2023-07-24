@@ -6,22 +6,16 @@ import 'package:itunes_music/viewModel/viewModeCtr.dart';
 import 'package:itunes_music/view/SongPage/songPage.dart';
 
 ///song Item widget show in resultView
-class SongItem extends StatefulWidget {
+class SongItem extends StatelessWidget {
   final Song song;
   const SongItem({super.key, required this.song});
 
   @override
-  State<SongItem> createState() => _SongItemState();
-}
-
-class _SongItemState extends State<SongItem> {
-  @override
   Widget build(BuildContext context) {
     var mode = Get.find<ViewModeCtr>().viewMode;
-
     return GestureDetector(
         onTap: () => Get.to(SongPage(
-              song: widget.song,
+              song: song,
             )),
         child: Container(
             margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -43,7 +37,7 @@ class _SongItemState extends State<SongItem> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: CachedNetworkImage(
-        imageUrl: widget.song.artworkUrl60.toString(),
+        imageUrl: song.artworkUrl60.toString(),
         fadeInDuration: const Duration(milliseconds: 80),
         progressIndicatorBuilder: (context, url, progress) {
           return Container(
@@ -79,13 +73,13 @@ class _SongItemState extends State<SongItem> {
               : CrossAxisAlignment.center,
           children: [
             Text(
-              widget.song.trackName.toString(),
+              song.trackName.toString(),
               maxLines: 1,
               overflow: TextOverflow.fade,
               softWrap: false,
             ),
             Text(
-              widget.song.artistName.toString(),
+              song.artistName.toString(),
               maxLines: 1,
               overflow: TextOverflow.fade,
             )

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/MediaObject.dart';
 import 'package:itunes_music/model/album.dart';
@@ -14,60 +13,63 @@ import '../../model/song.dart';
 import '../../utility/customTransition.dart';
 
 //resultview shows all results from itunes music api
-class ResultView extends StatefulWidget {
+class ResultView extends StatelessWidget {
   const ResultView({super.key});
 
-  @override
-  State<ResultView> createState() => _ResultViewState();
-}
-
-class _ResultViewState extends State<ResultView> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<SearchResultCtr>(
       builder: (controller) {
-        var modeCtr = Get.find<ViewModeCtr>();
         if (controller.result.isEmpty) {
           return Center(
             child: Text('No items match your search'.tr),
           );
         }
+        var modeCtr = Get.find<ViewModeCtr>();
         return modeCtr.viewMode == ViewMode.list
-            ? ListView.builder(
-                cacheExtent: 15,
-                itemCount: controller.result.length,
-                itemBuilder: (context, index) {
-                  var mediaObject = controller.result[index];
-                  //animation when switch to gridview or listview
-                  return Hero(
-                      tag: index,
-                      createRectTween: (Rect? begin, Rect? end) {
-                        return CustomTransitions(a: begin!, b: end!);
-                      },
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: returnItem(mediaObject),
-                      ));
-                },
-              )
-            : GridView.count(
-                crossAxisCount: 2,
-                childAspectRatio: modeCtr.viewMode == ViewMode.grid ? 1.1 : 1.3,
-                children: List.generate(controller.result.length, (index) {
-                  var mediaObject = controller.result[index];
-                  //animation when switch to gridview or listview
-                  return Hero(
-                      tag: index,
-                      createRectTween: (Rect? begin, Rect? end) {
-                        return CustomTransitions(a: begin!, b: end!);
-                      },
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: returnItem(mediaObject),
-                      ));
-                }));
+            ? listviewMode(controller.result)
+            : gridviewMode(controller.result);
       },
     );
+  }
+
+  Widget listviewMode(List<MediaObject> results) {
+    return ListView.builder(
+      cacheExtent: 15,
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        var mediaObject = results[index];
+        //animation when switch to gridview or listview
+        return Hero(
+            tag: index,
+            createRectTween: (Rect? begin, Rect? end) {
+              return CustomTransitions(a: begin!, b: end!);
+            },
+            child: Material(
+              type: MaterialType.transparency,
+              child: returnItem(mediaObject),
+            ));
+      },
+    );
+  }
+
+  Widget gridviewMode(List<MediaObject> results) {
+    return GridView.count(
+        crossAxisCount: 2,
+        childAspectRatio: results.first is Artist ? 1.1 : 1.3,
+        children: List.generate(results.length, (index) {
+          var mediaObject = results[index];
+          //animation when switch to gridview or listview
+          return Hero(
+              tag: index,
+              createRectTween: (Rect? begin, Rect? end) {
+                return CustomTransitions(a: begin!, b: end!);
+              },
+              child: Material(
+                type: MaterialType.transparency,
+                child: returnItem(mediaObject),
+              ));
+        }));
   }
 
   ///show item based on wrapperType
