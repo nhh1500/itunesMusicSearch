@@ -15,7 +15,9 @@ class _SearchOnLangPageState extends State<SearchOnLangPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
       body: Column(
         children: [
           ListTile(

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/artist.dart';
+import 'package:itunes_music/utility/customTransition.dart';
 import 'package:itunes_music/view/ArtistPage/artistPage.dart';
 import '../../viewModel/viewModeCtr.dart';
 
@@ -30,10 +31,28 @@ class _ArtistItemState extends State<ArtistItem> {
                     borderRadius: BorderRadius.circular(15),
                     color: Colors.grey[300]),
                 child: Row(
-                  children: [imageWidget(), mediaInfo(mode)],
+                  children: [
+                    Hero(
+                        tag: 'image${widget.artist.artistId}',
+                        createRectTween: (begin, end) =>
+                            CustomTransitions(a: begin!, b: end!),
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: imageWidget(),
+                        )),
+                    mediaInfo(mode)
+                  ],
                 ))
             : Column(
-                children: [gridImage(), mediaInfo(mode)],
+                children: [
+                  Hero(
+                      tag: 'image${widget.artist.artistId}',
+                      createRectTween: (begin, end) =>
+                          CustomTransitions(a: begin!, b: end!),
+                      child: Material(
+                          type: MaterialType.transparency, child: gridImage())),
+                  mediaInfo(mode)
+                ],
               ));
   }
 
@@ -95,17 +114,29 @@ class _ArtistItemState extends State<ArtistItem> {
               ? CrossAxisAlignment.start
               : CrossAxisAlignment.center,
           children: [
-            Text(
-              widget.artist.artistName.toString(),
-              maxLines: 1,
-              overflow: TextOverflow.fade,
-              softWrap: false,
-            ),
-            Text(
-              '${widget.artist.artistType.toString()} - ${widget.artist.primaryGenreName}',
-              maxLines: 1,
-              overflow: TextOverflow.fade,
-            )
+            Hero(
+                tag: 'ArtistName${widget.artist.artistId}',
+                createRectTween: (begin, end) =>
+                    CustomTransitions(a: begin!, b: end!),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Text(
+                    widget.artist.artistName.toString(),
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                  ),
+                )),
+            Hero(
+                tag: 'ArtistType${widget.artist.artistId}',
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Text(
+                    '${widget.artist.artistType.toString()} - ${widget.artist.primaryGenreName}',
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                  ),
+                ))
           ],
         ),
       ),

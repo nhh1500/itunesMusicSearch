@@ -1,8 +1,10 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:rxdart/rxdart.dart' as rx;
+import 'package:uuid/uuid.dart';
 import '../model/positionData.dart';
 import '../model/song.dart';
 
@@ -12,6 +14,13 @@ class AudioPlayerVM extends GetxController {
   final _equalizer = AndroidEqualizer();
   final _loudnessEnhancer = AndroidLoudnessEnhancer();
 
+  ///main audio controller
+  late final AudioPlayer _player = AudioPlayer(
+      audioPipeline:
+          AudioPipeline(androidAudioEffects: [_loudnessEnhancer, _equalizer]));
+
+  //late AudioPlayerHandler _audioHandler;
+
   ///return current source metadata that is playing
   Song? get currentSource => _player.sequenceState?.currentSource?.tag as Song?;
 
@@ -20,12 +29,6 @@ class AudioPlayerVM extends GetxController {
 
   ///boosts the volume of the audio signal to a target gain, which defaults to zero
   AndroidLoudnessEnhancer get loudnessEnhancer => _loudnessEnhancer;
-
-  ///main audio controller
-  late final AudioPlayer _player = AudioPlayer(
-      audioPipeline:
-          AudioPipeline(androidAudioEffects: [_loudnessEnhancer, _equalizer]));
-  ConcatenatingAudioSource _playerList = ConcatenatingAudioSource(children: []);
 
   ///return current position of the song that is playing
   Stream<PositionData> get positionDataStream =>
@@ -38,35 +41,15 @@ class AudioPlayerVM extends GetxController {
   Stream<SequenceState?> get sequenceStateStream => _player.sequenceStateStream;
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
 
-  ///append audio source to current playList
-  Future addPlayList(Song song) async {
-    AudioSource source = LockCachingAudioSource(
-        Uri.parse(song.previewUrl.toString()),
-        tag: song);
-    await _playerList.add(source);
-  }
-
   ///set multiple audio source
   Future setPlayList(List<Song> songList) async {
-    await _playerList.clear();
-    List<AudioSource> sourceList = [];
-    for (var item in songList) {
-      sourceList.add(LockCachingAudioSource(
-          Uri.parse(item.previewUrl.toString()),
-          tag: item));
-    }
-    await _playerList.addAll(sourceList);
-    await _player.setAudioSource(_playerList);
-  }
-
-  ///remove specific item from playlist
-  Future removePlayList(int index) async {
-    await _playerList.removeAt(index);
-  }
-
-  ///clear playlist
-  Future clearPlayList() async {
-    await _playerList.clear();
+    List<AudioSource> sourceList = songList
+        .map((song) => LockCachingAudioSource(
+            Uri.parse(song.previewUrl.toString()),
+            tag: song))
+        .toList();
+    await _player
+        .setAudioSource(ConcatenatingAudioSource(children: sourceList));
   }
 
   /// seek to specific position, if index != null then it will seek to specific song in the playlist

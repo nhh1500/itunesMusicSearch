@@ -14,7 +14,9 @@ class _SearchOnCountryPageState extends State<SearchOnCountryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
       body: Column(
         children: [
           ListTile(

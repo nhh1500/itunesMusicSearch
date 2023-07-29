@@ -51,11 +51,12 @@ class SearchPage extends StatelessWidget {
               } else {
                 controller.setMode(ViewMode.list);
               }
+
               Navigator.of(navigatorKey.currentContext!)
                   .pushReplacement(createRoute(const SearchPage()));
             },
             icon: controller.viewMode == ViewMode.list
-                ? const Icon(Icons.grid_3x3)
+                ? const Icon(Icons.grid_view)
                 : const Icon(Icons.list));
       },
     );

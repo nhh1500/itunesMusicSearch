@@ -1,15 +1,18 @@
 import 'dart:convert';
 
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:itunes_music/main.dart';
 import 'package:itunes_music/model/artist.dart';
 import 'package:itunes_music/model/playListBody.dart';
 import 'package:itunes_music/model/playListHeader.dart';
 import 'package:itunes_music/services/ApiController.dart';
 import 'package:itunes_music/utility/sharedPrefs.dart';
+import 'package:itunes_music/utility/toastMessage.dart';
 import 'package:itunes_music/view/ArtistPage/artistPage.dart';
 import 'package:itunes_music/view/SongPage/addtoPlayListWidget.dart';
 import 'package:itunes_music/viewModel/audioPlayer.dart';
@@ -23,7 +26,6 @@ import '../../model/positionData.dart';
 import '../../model/song.dart';
 import '../AudioPlayView/equalizerControls.dart';
 import '../AudioPlayView/loudnessEnhancerControl.dart';
-import '../AudioPlayView/seekBar.dart';
 
 /// a page to play music whether a song or playlists
 /// also support equalizer and loudness enhancer
@@ -120,7 +122,10 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
               actions: [
                 IconButton(onPressed: () {}, icon: const Icon(Icons.share)),
                 IconButton(
-                    onPressed: () {}, icon: const Icon(Icons.info_outline))
+                    onPressed: () {
+                      showAudioInfo();
+                    },
+                    icon: const Icon(Icons.info_outline))
               ],
             ),
             body: Column(
@@ -148,7 +153,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
       children: [
         IconButton(onPressed: () {}, icon: const Icon(Icons.favorite)),
         IconButton(
-            onPressed: _showAddPlayList, icon: const Icon(Icons.list_rounded)),
+            onPressed: _showAddPlayList, icon: const Icon(Icons.playlist_add)),
         //show equalizer button if sharePreference set to true
         userConfig.equalizer
             ? IconButton(
@@ -170,11 +175,16 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
       stream: player.positionDataStream,
       builder: (context, snapshot) {
         final positionData = snapshot.data;
-        return SeekBar(
-          duration: positionData?.duration ?? Duration.zero,
-          position: positionData?.position ?? Duration.zero,
-          bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
-          onChangeEnd: player.seek,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: ProgressBar(
+            progress: positionData?.position ?? Duration.zero,
+            buffered: positionData?.bufferedPosition ?? Duration.zero,
+            total: positionData?.duration ?? Duration.zero,
+            onSeek: (duration) {
+              player.seek(duration);
+            },
+          ),
         );
       },
     );
@@ -190,6 +200,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
         if (state?.sequence.isEmpty ?? true) {
           return const SizedBox();
         }
+
         final metadata = state!.currentSource!.tag as Song;
         return LayoutBuilder(
           builder: (p0, p1) {
@@ -227,6 +238,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
         if (state?.sequence.isEmpty ?? true) {
           return const SizedBox();
         }
+
         final metadata = state!.currentSource!.tag as Song;
         return Column(
           children: [
@@ -298,12 +310,23 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
           ),
           //previous music
           GestureDetector(
-              onTap: player.seekToPrevious, child: previousButton()),
+              onTap: () async {
+                bool success = await player.seekToPrevious();
+                if (!success) {
+                  ToastMessage.displayFloast('No previous song'.tr);
+                }
+              },
+              child: previousButton()),
           //play or pause music
           playbuttonWidget(),
           //next music
           GestureDetector(
-            onTap: player.seekToNext,
+            onTap: () async {
+              bool success = await player.seekToNext();
+              if (!success) {
+                ToastMessage.displayFloast('No next song'.tr);
+              }
+            },
             child: forwardButton(),
           ),
           //volume control
@@ -316,7 +339,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
           //show playlist if user enter this page from playlist or album page, otherwise should only show one song
           GestureDetector(
             onTap: showPlayList,
-            child: Icon(Icons.list_alt_outlined),
+            child: const Icon(Icons.playlist_play),
           )
         ],
       ),
@@ -504,8 +527,9 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
             // set text to blue if audio is current playing this song
             Text(
               song.trackName.toString(),
-              style:
-                  index == currentIndex ? TextStyle(color: Colors.blue) : null,
+              style: index == currentIndex
+                  ? const TextStyle(color: Colors.blue)
+                  : null,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -565,5 +589,98 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
             ));
       },
     );
+  }
+
+  void showAudioInfo() {
+    showModalBottomSheet(
+      backgroundColor: Colors.white.withOpacity(0.95),
+      context: navigatorKey.currentContext!,
+      builder: (context) {
+        return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: SingleChildScrollView(
+              child: StreamBuilder<SequenceState?>(
+                stream: player.sequenceStateStream,
+                builder: (context, snapshot) {
+                  final state = snapshot.data;
+                  final currentIndex = snapshot.data?.currentIndex;
+
+                  Song? currentSong = snapshot.data?.currentSource?.tag;
+                  return keyValueWidget({
+                    'kind': '${currentSong?.kind}',
+                    'ArtistId': '${currentSong?.artistId}',
+                    'collectionId': '${currentSong?.collectionId}',
+                    'trackId': '${currentSong?.trackId}',
+                    'artistName': '${currentSong?.artistName}',
+                    'collectionName': '${currentSong?.collectionName}',
+                    'TrackName': '${currentSong?.trackName}',
+                    'collectionCensoredName':
+                        '${currentSong?.collectionCensoredName}',
+                    'trackCensoredName': '${currentSong?.trackCensoredName}',
+                    'artistViewUrl': '${currentSong?.artistViewUrl}',
+                    'collectionViewUrl': '${currentSong?.collectionViewUrl}',
+                    'trackViewUrl': '${currentSong?.trackViewUrl}',
+                    'previewUrl': '${currentSong?.previewUrl}',
+                    'artworkUrl30': '${currentSong?.artworkUrl30}',
+                    'artworkUrl60': '${currentSong?.artworkUrl60}',
+                    'artworkUrl100': '${currentSong?.artworkUrl100}',
+                    'collectionPrice': '${currentSong?.collectionPrice}',
+                    'trackPrice': '${currentSong?.trackPrice}',
+                    'releaseDate': currentSong?.releaseDate,
+                    'collectionExplicitness':
+                        '${currentSong?.collectionExplicitness}',
+                    'trackExplicitness': '${currentSong?.trackExplicitness}',
+                    'discCount': '${currentSong?.discCount}',
+                    'discNumber': '${currentSong?.discNumber}',
+                    'trackNumber': '${currentSong?.trackNumber}',
+                    'trackTimeMillis': '${currentSong?.trackTimeMillis}',
+                    'country': '${currentSong?.country}',
+                    'currency': '${currentSong?.currency}',
+                    'primaryGenreName': '${currentSong?.primaryGenreName}',
+                    'isStreamable': '${currentSong?.isStreamable}',
+                  });
+                },
+              ),
+            ));
+      },
+    );
+  }
+
+  Widget keyValueWidget(Map<String, dynamic> info) {
+    return SelectionArea(
+        child: Container(
+      margin: const EdgeInsets.all(15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: List.generate(info.length, (index) {
+          dynamic value = info.values.elementAt(index);
+          if (value is DateTime) {
+            value = DateFormat('yyyy-MM-dd – kk:mm')
+                .format((info.values.elementAt(index) as DateTime));
+          }
+          return Container(
+            margin: const EdgeInsets.only(bottom: 5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 140,
+                  child: Text(info.keys.elementAt(index)),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child: Container(
+                  child: Text(
+                    value.toString(),
+                  ),
+                ))
+              ],
+            ),
+          );
+        }),
+      ),
+    ));
   }
 }

@@ -40,15 +40,18 @@ class ResultView extends StatelessWidget {
       itemBuilder: (context, index) {
         var mediaObject = results[index];
         //animation when switch to gridview or listview
-        return Hero(
-            tag: index,
-            createRectTween: (Rect? begin, Rect? end) {
-              return CustomTransitions(a: begin!, b: end!);
-            },
-            child: Material(
-              type: MaterialType.transparency,
-              child: returnItem(mediaObject),
-            ));
+        if (results.first is Artist) {
+          return returnItem(mediaObject);
+        } else {
+          return Hero(
+              tag: index,
+              createRectTween: (begin, end) =>
+                  CustomTransitions(a: begin!, b: end!),
+              child: Material(
+                type: MaterialType.transparency,
+                child: returnItem(mediaObject),
+              ));
+        }
       },
     );
   }
@@ -60,15 +63,18 @@ class ResultView extends StatelessWidget {
         children: List.generate(results.length, (index) {
           var mediaObject = results[index];
           //animation when switch to gridview or listview
-          return Hero(
-              tag: index,
-              createRectTween: (Rect? begin, Rect? end) {
-                return CustomTransitions(a: begin!, b: end!);
-              },
-              child: Material(
-                type: MaterialType.transparency,
-                child: returnItem(mediaObject),
-              ));
+          if (results.first is Artist) {
+            return returnItem(mediaObject);
+          } else {
+            return Hero(
+                tag: index,
+                createRectTween: (begin, end) =>
+                    CustomTransitions(a: begin!, b: end!),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: returnItem(mediaObject),
+                ));
+          }
         }));
   }
 

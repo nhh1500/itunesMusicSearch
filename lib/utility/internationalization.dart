@@ -47,7 +47,9 @@ class Translate extends Translations {
           'No Playlist': '沒有歌單',
           'Create Playlist': '創建歌單',
           'Playlist Name': '歌單名稱',
-          'Create': '創建'
+          'Create': '創建',
+          'No previous song': '沒有上一個音樂',
+          'No next song': '沒有下一個音樂'
         }
       };
 }
