@@ -12,22 +12,16 @@ class SearchTextField extends StatefulWidget {
 }
 
 class _SearchTextFieldState extends State<SearchTextField> {
-  final TextEditingController _controler = TextEditingController();
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controler.dispose();
-  }
+  SearchResultCtr vm = Get.find<SearchResultCtr>();
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: _controler,
+      controller: vm.controller,
       onSubmitted: (value) async {
         //show loading widget during api call
         EasyLoading.show(status: 'Loading');
-        await Get.find<SearchResultCtr>().search(_controler.text);
+        await Get.find<SearchResultCtr>().search(vm.controller.text);
         //dimiss loading widget when api return
         EasyLoading.dismiss();
       },
@@ -39,7 +33,7 @@ class _SearchTextFieldState extends State<SearchTextField> {
           prefixIcon: const Icon(Icons.search),
           suffixIcon: IconButton(
               onPressed: () {
-                _controler.clear();
+                vm.controller.clear();
               },
               icon: const Icon(Icons.clear))),
     );

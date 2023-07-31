@@ -14,8 +14,17 @@ import '../services/ApiController.dart';
 ///search results view model
 ///once API complete it will notify resultPage Widget to update
 class SearchResultCtr extends GetxController {
+  final TextEditingController _controller = TextEditingController();
   final List<MediaObject> _result = [];
+
+  TextEditingController get controller => _controller;
   List<MediaObject> get result => _result;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   void notify() {
     update();
