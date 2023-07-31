@@ -49,7 +49,11 @@ class Translate extends Translations {
           'Playlist Name': '歌單名稱',
           'Create': '創建',
           'No previous song': '沒有上一個音樂',
-          'No next song': '沒有下一個音樂'
+          'No next song': '沒有下一個音樂',
+          'Rename': '重新命名',
+          'Delete': '刪除',
+          'Rename Playlist': '重新命名歌單',
+          'Cancel': '取消'
         }
       };
 }

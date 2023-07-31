@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/playListBody.dart';
@@ -111,10 +111,32 @@ class _PlayListDetailPageState extends State<PlayListDetailPage> {
   //list of songs
   Widget body() {
     if (playlist.isNotEmpty) {
-      return SingleChildScrollView(
-          child: Column(
-              children: List.generate(
-                  songs.length, (index) => SongItem(song: songs[index]))));
+      return ReorderableListView.builder(
+          shrinkWrap: true,
+          buildDefaultDragHandles: false,
+          itemBuilder: (context, index) {
+            return Row(
+              key: Key('$index'),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                    child: GestureDetector(
+                  onLongPress: () async {
+                    await _showOption(playlist[index]);
+                  },
+                  child: SongItem(song: songs[index]),
+                )),
+                ReorderableDragStartListener(
+                    index: index,
+                    child: const Icon(
+                      Icons.drag_handle,
+                      color: Color.fromARGB(255, 155, 155, 155),
+                    ))
+              ],
+            );
+          },
+          itemCount: songs.length,
+          onReorder: onReorder);
     } else {
       return emptyPlayList();
     }
@@ -124,6 +146,52 @@ class _PlayListDetailPageState extends State<PlayListDetailPage> {
   Widget emptyPlayList() {
     return const Center(
       child: Text('Empty'),
+    );
+  }
+
+  //reorder Index
+  Future onReorder(int oldIndex, int newIndex) async {
+    setState(() {
+      if (oldIndex < newIndex) {
+        newIndex -= 1;
+      }
+      var row = playlist.removeAt(oldIndex);
+      playlist.insert(newIndex, row);
+
+      var row2 = songs.removeAt(oldIndex);
+      songs.insert(newIndex, row2);
+    });
+    await updateIndex(min(oldIndex, newIndex));
+  }
+
+  //update Index
+  Future updateIndex(int minIndex) async {
+    for (int i = minIndex; i < playlist.length; i++) {
+      playlist[i].index = i;
+      await vm.updateRec(playlist[i]);
+    }
+  }
+
+  //show option to rename or delete
+  Future<void> _showOption(PlayListBody body) async {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                onTap: () async {
+                  await vm.delete(body.headerId, body.songId);
+                  Get.back();
+                  refresh();
+                },
+                title: Text('Delete'.tr),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }

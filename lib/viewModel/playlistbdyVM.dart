@@ -43,7 +43,9 @@ CREATE TABLE $tableName (
     final maps = await _database!.query(tableName,
         columns: PlayListBodyFields.values,
         where: '${PlayListBodyFields.headerId} = ?',
-        whereArgs: [headerId]);
+        whereArgs: [headerId],
+        orderBy: PlayListBodyFields.index);
+
     List<PlayListBody> listBdy = [];
     for (var item in maps) {
       listBdy.add(PlayListBody.fromJson(item));
@@ -85,6 +87,12 @@ CREATE TABLE $tableName (
         where:
             '${PlayListBodyFields.headerId} = ? And ${PlayListBodyFields.songId} = ?',
         whereArgs: [headerId, songId]);
+  }
+
+  //delete all songs in playlist
+  Future<void> deleteAll(int headerId) async {
+    await _database!.delete(tableName,
+        where: '${PlayListBodyFields.headerId} = ?', whereArgs: [headerId]);
   }
 
   /// close database

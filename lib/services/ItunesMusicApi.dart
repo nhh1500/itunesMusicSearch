@@ -53,6 +53,7 @@ class ItunesMusicApi {
     String encodeUrl = Uri.encodeFull(url);
     print('api send $encodeUrl');
     var response = await ApiHandler.getAPI(encodeUrl);
+    print('api return');
     return response;
   }
 
@@ -92,6 +93,8 @@ class ItunesMusicApi {
     String encodeUrl = Uri.encodeFull(url);
     print('api send $encodeUrl');
     var response = await ApiHandler.getAPI(encodeUrl);
+    print('api return');
+
     return response;
   }
 
@@ -126,6 +129,8 @@ class ItunesMusicApi {
     String encodeUrl = Uri.encodeFull(url);
     print('api send $encodeUrl');
     var response = await ApiHandler.getAPI(encodeUrl);
+    print('api return');
+
     return response;
   }
 
@@ -136,6 +141,8 @@ class ItunesMusicApi {
     print('api send $url');
     try {
       var response = await ApiHandler.getAPI(url);
+      print('api return');
+
       RegExp regEx = RegExp("<meta property=\"og:image\" content=\"(.*png)\"");
       RegExpMatch? match = regEx.firstMatch(response);
       if (match != null) {

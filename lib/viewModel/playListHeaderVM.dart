@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 import 'package:itunes_music/model/dbType.dart';
+import 'package:itunes_music/model/playListBody.dart';
+import 'package:itunes_music/viewModel/playlistbdyVM.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:itunes_music/model/playListHeader.dart';
@@ -48,8 +50,9 @@ CREATE TABLE $tableName (
 
   ///delete record
   Future<void> delete(PlayListHeader header) async {
+    await Get.find<PlayListbdyVM>().deleteAll(header.id!);
     await _database!.delete(tableName,
-        where: '${PlayListHeaderFields.id} = "?', whereArgs: [header.id]);
+        where: '${PlayListHeaderFields.id} = ?', whereArgs: [header.id]);
   }
 
   /// close database

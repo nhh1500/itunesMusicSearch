@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:itunes_music/main.dart';
 import 'package:itunes_music/model/playListHeader.dart';
 import 'package:itunes_music/view/playList/playListDetail.dart';
 import 'package:itunes_music/viewModel/playListHeaderVM.dart';
@@ -46,7 +47,8 @@ class _PlayListPageState extends State<PlayListPage> {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           actions: [
             //add new playlist
-            IconButton(onPressed: _showMyDialog, icon: const Icon(Icons.add))
+            IconButton(
+                onPressed: createPlayListDialog, icon: const Icon(Icons.add))
           ],
         ),
         body: FutureBuilder(
@@ -77,6 +79,9 @@ class _PlayListPageState extends State<PlayListPage> {
   //show playlist name
   Widget listItem(PlayListHeader header) {
     return ListTile(
+      onLongPress: () async {
+        await _showOption(header);
+      },
       onTap: () async {
         var vm = Get.find<PlayListbdyVM>();
         await vm.readPlayListDetail(header.id!);
@@ -100,7 +105,7 @@ class _PlayListPageState extends State<PlayListPage> {
             style: TextStyle(fontSize: 32),
           ),
           ElevatedButton(
-              onPressed: _showMyDialog,
+              onPressed: createPlayListDialog,
               child: Text(
                 'Create Playlist'.tr,
                 style: TextStyle(fontSize: 28),
@@ -111,7 +116,7 @@ class _PlayListPageState extends State<PlayListPage> {
   }
 
   //dialog to create new playlist
-  Future<void> _showMyDialog() async {
+  Future<void> createPlayListDialog() async {
     return showDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -143,6 +148,82 @@ class _PlayListPageState extends State<PlayListPage> {
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  //dialog to rename playlist
+  Future<void> renamePlayListDialog(PlayListHeader header) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        textController.clear();
+        textController.text = header.listName.toString();
+        return AlertDialog(
+          title: Text('Rename Playlist'.tr),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Playlist Name'.tr),
+                TextField(
+                  controller: textController,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'.tr),
+              onPressed: () async {
+                Get.back();
+              },
+            ),
+            TextButton(
+              child: Text('Rename'.tr),
+              onPressed: () async {
+                if (textController.text == '') return;
+                //add playlist name to database
+                header.listName = textController.text;
+                await vm.updateRec(header);
+                await refresh();
+                Get.back();
+                Get.back();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //show option to rename or delete
+  Future<void> _showOption(PlayListHeader header) async {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                onTap: () async {
+                  await renamePlayListDialog(header);
+                  refresh();
+                },
+                title: Text('Rename'.tr),
+              ),
+              ListTile(
+                onTap: () async {
+                  await vm.delete(header);
+                  Get.back();
+                  refresh();
+                },
+                title: Text('Delete'.tr),
+              )
+            ],
+          ),
         );
       },
     );
