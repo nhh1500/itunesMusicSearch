@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/playListBody.dart';
 import 'package:itunes_music/model/song.dart';
-import 'package:itunes_music/services/ApiController.dart';
+import 'package:itunes_music/services/Api/ApiController.dart';
+import 'package:itunes_music/services/DB/dbManager.dart';
 import 'package:itunes_music/view/SearchPage/songItem.dart';
 import 'package:itunes_music/view/SongPage/songPage.dart';
-import 'package:itunes_music/viewModel/playlistbdyVM.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 
 ///playlist detail
@@ -25,8 +25,6 @@ class PlayListDetailPage extends StatefulWidget {
 class _PlayListDetailPageState extends State<PlayListDetailPage> {
   ///user config view model
   UserConfig userConfig = Get.find<UserConfig>();
-  //playlist detail view model
-  PlayListbdyVM vm = Get.find<PlayListbdyVM>();
   Future? future;
 
   ///all songs
@@ -42,7 +40,7 @@ class _PlayListDetailPageState extends State<PlayListDetailPage> {
   }
 
   Future refresh() async {
-    playlist = await vm.readPlayListDetail(widget.playListHeaderId);
+    playlist = await DBManager.playlistBody.read(widget.playListHeaderId);
     songs = await fetchAllSong();
     setState(() {});
   }
@@ -168,7 +166,7 @@ class _PlayListDetailPageState extends State<PlayListDetailPage> {
   Future updateIndex(int minIndex) async {
     for (int i = minIndex; i < playlist.length; i++) {
       playlist[i].index = i;
-      await vm.updateRec(playlist[i]);
+      await DBManager.playlistBody.updateRec(playlist[i]);
     }
   }
 
@@ -182,7 +180,8 @@ class _PlayListDetailPageState extends State<PlayListDetailPage> {
             children: [
               ListTile(
                 onTap: () async {
-                  await vm.delete(body.headerId, body.songId);
+                  await DBManager.playlistBody
+                      .delete(body.headerId, body.songId);
                   Get.back();
                   refresh();
                 },

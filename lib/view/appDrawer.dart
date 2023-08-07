@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:itunes_music/view/SearchPage/searchPage.dart';
 import 'package:itunes_music/view/playList/playListPage.dart';
 import 'package:itunes_music/view/SettingsPage/settingsPage.dart';
-import 'package:itunes_music/viewModel/playListHeaderVM.dart';
 
 /// side menu used by searchPage
 class AppDrawer extends StatelessWidget {
@@ -28,8 +27,6 @@ class AppDrawer extends StatelessWidget {
         ListTile(
           onTap: () async {
             Get.back();
-            var vm = Get.find<PlayListHeaderVM>();
-            await vm.readAll();
             Get.to(const PlayListPage());
           },
           leading: Icon(Icons.list),

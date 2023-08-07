@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:itunes_music/services/statusCode.dart';
+import 'package:itunes_music/services/Api/statusCode.dart';
 
-import '../utility/alertMessageBox.dart';
+import '../../utility/alertMessageBox.dart';
 
 /// controller to request http post / get / put / delete
 class ApiHandler {

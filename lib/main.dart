@@ -1,13 +1,10 @@
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:itunes_music/services/DB/dbManager.dart';
+import 'package:itunes_music/services/audio/audioController.dart';
 import 'package:itunes_music/utility/internationalization.dart';
-import 'package:itunes_music/view/AudioPlayView/overlayPlayer.dart';
-import 'package:itunes_music/viewModel/audioPlayer.dart';
 import 'package:itunes_music/viewModel/overlayPlayerVM.dart';
-import 'package:itunes_music/viewModel/playListHeaderVM.dart';
-import 'package:itunes_music/viewModel/playlistbdyVM.dart';
 import 'package:itunes_music/viewModel/searchModeCtr.dart';
 import 'package:itunes_music/viewModel/searchResultCtr.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
@@ -17,15 +14,10 @@ import 'package:itunes_music/view/SearchPage/searchPage.dart';
 
 ///navigatorKey for global use
 GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 //var logger = Logger();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  initGetxController();
-  await Future.wait([SharedPrefs.init()]);
-  initConfig();
-  configEasyLoading();
-  initDB();
+  await init();
   runApp(const MyApp());
 }
 
@@ -66,22 +58,23 @@ class MyApp extends StatelessWidget {
   }
 }
 
+Future init() async {
+  await Future.wait([SharedPrefs.init(), DBManager.init()]);
+  initGetxController();
+  await Get.find<AudioController>().init();
+  initConfig();
+  configEasyLoading();
+}
+
 ///init GetxController
 void initGetxController() {
-  Get.put(AudioPlayerVM(), permanent: true);
+  //Get.put(AudioPlayerVM(), permanent: true);
+  Get.put(AudioController(), permanent: true);
   Get.put(SearchModelCtr(), permanent: true);
   Get.put(SearchResultCtr(), permanent: true);
   Get.put(ViewModeCtr(), permanent: true);
   Get.put(UserConfig(), permanent: true);
-  Get.put(PlayListHeaderVM(), permanent: true);
-  Get.put(PlayListbdyVM(), permanent: true);
   Get.put(OverLayPlayerVM(), permanent: true);
-}
-
-/// init Database
-void initDB() {
-  Get.find<PlayListHeaderVM>().init();
-  Get.find<PlayListbdyVM>().init();
 }
 
 /// init Userconfig

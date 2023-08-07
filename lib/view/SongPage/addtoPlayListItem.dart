@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/model/playListBody.dart';
-import 'package:itunes_music/viewModel/playlistbdyVM.dart';
+import 'package:itunes_music/services/DB/dbManager.dart';
 
 ///single playList allow user to select and diselect song from playList
 class AddToPlayListItem extends StatefulWidget {
@@ -26,9 +26,6 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
   /// hold all songs in the playList
   List<PlayListBody> list = [];
 
-  /// playList view model
-  var plbdyvm = Get.find<PlayListbdyVM>();
-
   @override
   void initState() {
     super.initState();
@@ -36,7 +33,8 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
   }
 
   Future localRefresh() async {
-    list = await plbdyvm.readSong(widget.headerId, widget.songId);
+    list = await DBManager.playlistBody
+        .read(songId: widget.songId, widget.headerId);
     setState(() {});
   }
 
@@ -77,7 +75,7 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
   ///create record if user select this song
   Future createRecord() async {
     int availableIndex = await findAvailableIndex();
-    await plbdyvm.create(PlayListBody(
+    await DBManager.playlistBody.create(PlayListBody(
         headerId: widget.headerId,
         index: availableIndex,
         songId: widget.songId));
@@ -85,15 +83,14 @@ class _AddToPlayListItemState extends State<AddToPlayListItem> {
 
   ///delete record if user diselected this song from playList
   Future deleteRecord() async {
-    return await plbdyvm.delete(widget.headerId, widget.songId);
+    return await DBManager.playlistBody.delete(widget.headerId, widget.songId);
   }
 
   ///find available Index in database
   Future<int> findAvailableIndex() async {
     int availableIndex = 0;
-
     List<PlayListBody> playlistDetail =
-        await plbdyvm.readPlayListDetail(widget.headerId);
+        await DBManager.playlistBody.read(widget.headerId);
     for (var rec in playlistDetail) {
       if (rec.index > availableIndex) {
         availableIndex = rec.index;

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:itunes_music/services/ApiController.dart';
+import 'package:itunes_music/services/Api/ApiController.dart';
 import 'package:itunes_music/view/SongPage/songPage.dart';
 import 'package:itunes_music/view/AlbumPage/albumPage.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';

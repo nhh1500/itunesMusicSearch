@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:itunes_music/main.dart';
 import 'package:itunes_music/model/playListHeader.dart';
+import 'package:itunes_music/services/DB/dbManager.dart';
 import 'package:itunes_music/view/playList/playListDetail.dart';
-import 'package:itunes_music/viewModel/playListHeaderVM.dart';
-
-import '../../viewModel/playlistbdyVM.dart';
 
 class PlayListPage extends StatefulWidget {
   const PlayListPage({super.key});
@@ -15,8 +13,6 @@ class PlayListPage extends StatefulWidget {
 }
 
 class _PlayListPageState extends State<PlayListPage> {
-  //playlist view model
-  PlayListHeaderVM vm = Get.find<PlayListHeaderVM>();
   //all playlists
   List playlist = [];
   Future? future;
@@ -36,7 +32,7 @@ class _PlayListPageState extends State<PlayListPage> {
 
   //read all playlists in database and refresh
   Future refresh() async {
-    playlist = await vm.readAll();
+    playlist = await DBManager.playlistHeader.readAll();
     setState(() {});
   }
 
@@ -83,8 +79,6 @@ class _PlayListPageState extends State<PlayListPage> {
         await _showOption(header);
       },
       onTap: () async {
-        var vm = Get.find<PlayListbdyVM>();
-        await vm.readPlayListDetail(header.id!);
         Get.to(PlayListDetailPage(
           listName: header.listName.toString(),
           playListHeaderId: header.id ?? 0,
@@ -142,7 +136,7 @@ class _PlayListPageState extends State<PlayListPage> {
                 if (textController.text == '') return;
                 //add playlist name to database
                 var plh = PlayListHeader(listName: textController.text);
-                await vm.create(plh);
+                await DBManager.playlistHeader.create(plh);
                 await refresh();
                 Get.back();
               },
@@ -187,7 +181,7 @@ class _PlayListPageState extends State<PlayListPage> {
                 if (textController.text == '') return;
                 //add playlist name to database
                 header.listName = textController.text;
-                await vm.updateRec(header);
+                await DBManager.playlistHeader.updateRec(header);
                 await refresh();
                 Get.back();
                 Get.back();
@@ -216,7 +210,7 @@ class _PlayListPageState extends State<PlayListPage> {
               ),
               ListTile(
                 onTap: () async {
-                  await vm.delete(header);
+                  await DBManager.playlistHeader.delete(header);
                   Get.back();
                   refresh();
                 },

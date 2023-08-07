@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -10,20 +11,20 @@ import 'package:itunes_music/main.dart';
 import 'package:itunes_music/model/artist.dart';
 import 'package:itunes_music/model/playListBody.dart';
 import 'package:itunes_music/model/playListHeader.dart';
-import 'package:itunes_music/services/ApiController.dart';
+import 'package:itunes_music/services/Api/ApiController.dart';
 import 'package:itunes_music/utility/sharedPrefs.dart';
 import 'package:itunes_music/utility/toastMessage.dart';
 import 'package:itunes_music/view/ArtistPage/artistPage.dart';
 import 'package:itunes_music/view/SongPage/addtoPlayListWidget.dart';
 import 'package:itunes_music/viewModel/audioPlayer.dart';
-import 'package:itunes_music/viewModel/playListHeaderVM.dart';
-import 'package:itunes_music/viewModel/playlistbdyVM.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 import '../../model/positionData.dart';
 import '../../model/song.dart';
+import '../../services/audio/audioController.dart';
+import '../../services/audio/audioHandler.dart';
 import '../AudioPlayView/equalizerControls.dart';
 import '../AudioPlayView/loudnessEnhancerControl.dart';
 
@@ -41,7 +42,8 @@ class SongPage extends StatefulWidget {
 
 class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
   ///audio controller
-  AudioPlayerVM player = Get.find<AudioPlayerVM>();
+  //AudioPlayerVM player = Get.find<AudioPlayerVM>();
+  AudioController player = Get.find<AudioController>();
 
   /// user config containes info whether the user want to autoplay
   UserConfig userConfig = Get.find<UserConfig>();
@@ -50,7 +52,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     //observe app life cycle
-    WidgetsBinding.instance.addObserver(this);
+    //WidgetsBinding.instance.addObserver(this);
     // change mobile system bar color
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.black,
@@ -63,12 +65,12 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
     if (widget.songs == null && widget.song == null) {
       throw 'Error';
     }
-    await player.init();
+    //await player.init();
     if (widget.songs != null) {
       await player.setPlayList(widget.songs!);
       await player.seek(Duration.zero, index: widget.listIndex);
     } else {
-      await player.setAudio(widget.song!);
+      await player.setPlayList([widget.song!]);
     }
     if (userConfig.autoPlay) {
       await player.play();
@@ -78,7 +80,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
   @override
   void dispose() {
     super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
+    //WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
@@ -87,7 +89,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
       // Release the player's resources when not in use. We use "stop" so that
       // if the app resumes later, it will still remember what position to
       // resume from.
-      await player.stop();
+      //await player.stop();
     }
   }
 
@@ -97,14 +99,12 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
         child: Scaffold(
             appBar: AppBar(
               //streambuilder extract current audio source metadata and auto refresh whenever the source changed
-              title: StreamBuilder<SequenceState?>(
-                stream: player.sequenceStateStream,
+              title: StreamBuilder<MediaItem?>(
+                stream: player.mediaItem,
                 builder: (context, snapshot) {
-                  final state = snapshot.data;
-                  if (state?.sequence.isEmpty ?? true) {
-                    return const SizedBox();
-                  }
-                  final metadata = state!.currentSource!.tag as Song;
+                  final mediaItem = snapshot.data;
+                  if (mediaItem == null) return const SizedBox();
+                  final metadata = Song.fromJson(mediaItem.extras!);
                   //scroll text if title length too long
                   return TextScroll(
                     metadata.trackName.toString(),
@@ -142,7 +142,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
             )),
         onWillPop: () async {
           //stop song if user exits this page
-          await player.stop();
+          //await player.stop();
           return true;
         });
   }
@@ -193,15 +193,12 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
   //song image
   Widget imageWidget() {
     //streambuilder extract current audio metadata and auto refresh image whenever value updated
-    return StreamBuilder<SequenceState?>(
-      stream: player.sequenceStateStream,
+    return StreamBuilder<MediaItem?>(
+      stream: player.mediaItem,
       builder: (context, snapshot) {
-        final state = snapshot.data;
-        if (state?.sequence.isEmpty ?? true) {
-          return const SizedBox();
-        }
-
-        final metadata = state!.currentSource!.tag as Song;
+        final mediaItem = snapshot.data;
+        if (mediaItem == null) return const SizedBox();
+        final metadata = Song.fromJson(mediaItem.extras!);
         return LayoutBuilder(
           builder: (p0, p1) {
             return Column(
@@ -231,15 +228,12 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
     return Expanded(
         child: Center(
             //streambuilder extract current audio metadata and auto refresh widget whenever value updated
-            child: StreamBuilder<SequenceState?>(
-      stream: player.sequenceStateStream,
+            child: StreamBuilder<MediaItem?>(
+      stream: player.mediaItem,
       builder: (context, snapshot) {
-        final state = snapshot.data;
-        if (state?.sequence.isEmpty ?? true) {
-          return const SizedBox();
-        }
-
-        final metadata = state!.currentSource!.tag as Song;
+        final mediaItem = snapshot.data;
+        if (mediaItem == null) return const SizedBox();
+        final metadata = Song.fromJson(mediaItem.extras!);
         return Column(
           children: [
             //text scroll if text is too long
@@ -349,7 +343,7 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
   /// play button
   Widget playbuttonWidget() {
     //change icon widget according to player state
-    return StreamBuilder<PlayerState>(
+    return StreamBuilder<PlaybackState>(
       stream: player.playerStateStream,
       builder: (context, snapshot) {
         final playerState = snapshot.data;
@@ -570,11 +564,11 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
         return SizedBox(
             height: MediaQuery.of(context).size.height * 0.6,
             child: SingleChildScrollView(
-              child: StreamBuilder<SequenceState?>(
-                stream: player.sequenceStateStream,
+              child: StreamBuilder<QueueState?>(
+                stream: player.queueStateStream,
                 builder: (context, snapshot) {
-                  final state = snapshot.data;
-                  final currentIndex = snapshot.data?.currentIndex;
+                  final queueState = snapshot.data ?? QueueState.empty;
+                  final currentIndex = queueState.queueIndex;
                   if (widget.songs != null) {
                     return Column(
                         children: List.generate(
@@ -596,51 +590,43 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
       backgroundColor: Colors.white.withOpacity(0.95),
       context: navigatorKey.currentContext!,
       builder: (context) {
+        var currentSong = player.currentSource;
         return SizedBox(
             height: MediaQuery.of(context).size.height * 0.7,
             child: SingleChildScrollView(
-              child: StreamBuilder<SequenceState?>(
-                stream: player.sequenceStateStream,
-                builder: (context, snapshot) {
-                  final state = snapshot.data;
-                  final currentIndex = snapshot.data?.currentIndex;
-
-                  Song? currentSong = snapshot.data?.currentSource?.tag;
-                  return keyValueWidget({
-                    'kind': '${currentSong?.kind}',
-                    'ArtistId': '${currentSong?.artistId}',
-                    'collectionId': '${currentSong?.collectionId}',
-                    'trackId': '${currentSong?.trackId}',
-                    'artistName': '${currentSong?.artistName}',
-                    'collectionName': '${currentSong?.collectionName}',
-                    'TrackName': '${currentSong?.trackName}',
-                    'collectionCensoredName':
-                        '${currentSong?.collectionCensoredName}',
-                    'trackCensoredName': '${currentSong?.trackCensoredName}',
-                    'artistViewUrl': '${currentSong?.artistViewUrl}',
-                    'collectionViewUrl': '${currentSong?.collectionViewUrl}',
-                    'trackViewUrl': '${currentSong?.trackViewUrl}',
-                    'previewUrl': '${currentSong?.previewUrl}',
-                    'artworkUrl30': '${currentSong?.artworkUrl30}',
-                    'artworkUrl60': '${currentSong?.artworkUrl60}',
-                    'artworkUrl100': '${currentSong?.artworkUrl100}',
-                    'collectionPrice': '${currentSong?.collectionPrice}',
-                    'trackPrice': '${currentSong?.trackPrice}',
-                    'releaseDate': currentSong?.releaseDate,
-                    'collectionExplicitness':
-                        '${currentSong?.collectionExplicitness}',
-                    'trackExplicitness': '${currentSong?.trackExplicitness}',
-                    'discCount': '${currentSong?.discCount}',
-                    'discNumber': '${currentSong?.discNumber}',
-                    'trackNumber': '${currentSong?.trackNumber}',
-                    'trackTimeMillis': '${currentSong?.trackTimeMillis}',
-                    'country': '${currentSong?.country}',
-                    'currency': '${currentSong?.currency}',
-                    'primaryGenreName': '${currentSong?.primaryGenreName}',
-                    'isStreamable': '${currentSong?.isStreamable}',
-                  });
-                },
-              ),
+              child: keyValueWidget({
+                'kind': '${currentSong?.kind}',
+                'ArtistId': '${currentSong?.artistId}',
+                'collectionId': '${currentSong?.collectionId}',
+                'trackId': '${currentSong?.trackId}',
+                'artistName': '${currentSong?.artistName}',
+                'collectionName': '${currentSong?.collectionName}',
+                'TrackName': '${currentSong?.trackName}',
+                'collectionCensoredName':
+                    '${currentSong?.collectionCensoredName}',
+                'trackCensoredName': '${currentSong?.trackCensoredName}',
+                'artistViewUrl': '${currentSong?.artistViewUrl}',
+                'collectionViewUrl': '${currentSong?.collectionViewUrl}',
+                'trackViewUrl': '${currentSong?.trackViewUrl}',
+                'previewUrl': '${currentSong?.previewUrl}',
+                'artworkUrl30': '${currentSong?.artworkUrl30}',
+                'artworkUrl60': '${currentSong?.artworkUrl60}',
+                'artworkUrl100': '${currentSong?.artworkUrl100}',
+                'collectionPrice': '${currentSong?.collectionPrice}',
+                'trackPrice': '${currentSong?.trackPrice}',
+                'releaseDate': currentSong?.releaseDate,
+                'collectionExplicitness':
+                    '${currentSong?.collectionExplicitness}',
+                'trackExplicitness': '${currentSong?.trackExplicitness}',
+                'discCount': '${currentSong?.discCount}',
+                'discNumber': '${currentSong?.discNumber}',
+                'trackNumber': '${currentSong?.trackNumber}',
+                'trackTimeMillis': '${currentSong?.trackTimeMillis}',
+                'country': '${currentSong?.country}',
+                'currency': '${currentSong?.currency}',
+                'primaryGenreName': '${currentSong?.primaryGenreName}',
+                'isStreamable': '${currentSong?.isStreamable}',
+              }),
             ));
       },
     );

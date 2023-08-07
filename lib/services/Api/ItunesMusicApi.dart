@@ -1,4 +1,4 @@
-import 'package:itunes_music/services/apihandler.dart';
+import 'package:itunes_music/services/Api/apihandler.dart';
 
 /// controller to fetch data from Itunes
 class ItunesMusicApi {

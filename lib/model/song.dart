@@ -84,4 +84,40 @@ class Song extends MediaObject {
     primaryGenreName = json['primaryGenreName'];
     isStreamable = json['isStreamable'];
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['wrapperType'] = wrapperType;
+    data['kind'] = kind;
+    data['artistId'] = artistId;
+    data['collectionId'] = collectionId;
+    data['trackId'] = trackId;
+    data['artistName'] = artistName;
+    data['collectionName'] = collectionName;
+    data['trackName'] = trackName;
+    data['collectionCensoredName'] = collectionCensoredName;
+    data['trackCensoredName'] = trackCensoredName;
+    data['artistViewUrl'] = artistViewUrl;
+    data['collectionViewUrl'] = collectionViewUrl;
+    data['trackViewUrl'] = trackViewUrl;
+    data['previewUrl'] = previewUrl;
+    data['artworkUrl30'] = artworkUrl30;
+    data['artworkUrl60'] = artworkUrl60;
+    data['artworkUrl100'] = artworkUrl100;
+    data['collectionPrice'] = collectionPrice;
+    data['trackPrice'] = trackPrice;
+    data['releaseDate'] = releaseDate?.toIso8601String();
+    data['collectionExplicitness'] = collectionExplicitness;
+    data['trackExplicitness'] = trackExplicitness;
+    data['discCount'] = discCount;
+    data['discNumber'] = discNumber;
+    data['trackCount'] = trackCount;
+    data['trackNumber'] = trackNumber;
+    data['trackTimeMillis'] = trackTimeMillis;
+    data['country'] = country;
+    data['currency'] = currency;
+    data['primaryGenreName'] = primaryGenreName;
+    data['isStreamable'] = isStreamable;
+    return data;
+  }
 }

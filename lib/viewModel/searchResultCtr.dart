@@ -9,7 +9,7 @@ import '../model/MediaObject.dart';
 import '../model/album.dart';
 import '../model/artist.dart';
 import '../model/song.dart';
-import '../services/ApiController.dart';
+import '../services/Api/ApiController.dart';
 
 ///search results view model
 ///once API complete it will notify resultPage Widget to update

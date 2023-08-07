@@ -13,7 +13,7 @@ class OverlayPlayer extends StatefulWidget {
 }
 
 class _OverlayPlayerState extends State<OverlayPlayer> {
-  AudioPlayerVM player = Get.find<AudioPlayerVM>();
+  //AudioPlayerVM player = Get.find<AudioPlayerVM>();
   OverLayPlayerVM overlay = Get.find<OverLayPlayerVM>();
   double height = 50;
 

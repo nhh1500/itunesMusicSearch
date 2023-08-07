@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:itunes_music/services/DB/dbManager.dart';
 import '../../model/playListHeader.dart';
-import '../../viewModel/playListHeaderVM.dart';
 import 'addtoPlayListItem.dart';
 
 /// playList widget allow user to add song to playList
@@ -15,12 +15,11 @@ class AddToPlayListWidget extends StatefulWidget {
 
 class _AddToPlayListWidgetState extends State<AddToPlayListWidget> {
   Future? init;
-  var plhvm = Get.find<PlayListHeaderVM>();
   List<PlayListHeader> playlists = [];
 
   Future refresh() async {
     //read all playList from database and refresh widget
-    playlists = await plhvm.readAll();
+    playlists = await DBManager.playlistHeader.readAll();
     setState(() {});
   }
 
