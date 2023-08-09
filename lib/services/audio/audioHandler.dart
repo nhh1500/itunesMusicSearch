@@ -175,9 +175,43 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
     final enabled = shuffleMode == AudioServiceShuffleMode.all;
     if (enabled) {
       await _player.shuffle();
+      await _player.setShuffleModeEnabled(true);
+      _player.durationStream.listen((duration) {
+        var index = _player.currentIndex;
+        if (index != null && duration != null) {
+          final newQueue = queue.value;
+          final oldMediaItem = newQueue[index];
+          final newMediaItem = oldMediaItem.copyWith(duration: duration);
+          newQueue[index] = newMediaItem;
+          mediaItem.add(newMediaItem);
+          _currentSource = newMediaItem;
+          playbackState.add(playbackState.value.copyWith(
+            shuffleMode: shuffleMode,
+            updatePosition: _player.position,
+            bufferedPosition: _player.bufferedPosition,
+          ));
+        }
+      });
+    } else {
+      shuffleMode = AudioServiceShuffleMode.none;
+      await _player.setShuffleModeEnabled(false);
+      _player.durationStream.listen((duration) {
+        var index = _player.currentIndex;
+        if (index != null && duration != null) {
+          final newQueue = queue.value;
+          final oldMediaItem = newQueue[index];
+          final newMediaItem = oldMediaItem.copyWith(duration: duration);
+          newQueue[index] = newMediaItem;
+          mediaItem.add(newMediaItem);
+          _currentSource = newMediaItem;
+          playbackState.add(playbackState.value.copyWith(
+            shuffleMode: shuffleMode,
+            updatePosition: _player.position,
+            bufferedPosition: _player.bufferedPosition,
+          ));
+        }
+      });
     }
-    playbackState.add(playbackState.value.copyWith(shuffleMode: shuffleMode));
-    await _player.setShuffleModeEnabled(enabled);
   }
 
   @override
@@ -229,6 +263,16 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
           ? queue[queueIndex].copyWith(duration: duration)
           : null;
     }).whereType<MediaItem>().distinct().listen(mediaItem.add);
+    _player.durationStream.listen((duration) {
+      var index = _player.currentIndex;
+      if (index != null && duration != null) {
+        final newQueue = queue.value;
+        final oldMediaItem = newQueue[index];
+        final newMediaItem = oldMediaItem.copyWith(duration: duration);
+        newQueue[index] = newMediaItem;
+        mediaItem.add(newMediaItem);
+      }
+    });
     mediaItem.listen((value) {
       _currentSource = value;
     });
@@ -254,6 +298,7 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
         .pipe(queue);
   }
 
+  ///set audio source and precache audio
   @override
   Future setAudio() async {
     try {
@@ -261,7 +306,7 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
           initialIndex: 0, initialPosition: Duration.zero);
     } on PlayerInterruptedException catch (e) {
       if (kDebugMode) {
-        print("Exception $e");
+        print("Error loading audio source: $e");
       }
     }
   }

@@ -9,18 +9,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:itunes_music/main.dart';
 import 'package:itunes_music/model/artist.dart';
-import 'package:itunes_music/model/playListBody.dart';
-import 'package:itunes_music/model/playListHeader.dart';
 import 'package:itunes_music/services/Api/ApiController.dart';
-import 'package:itunes_music/utility/sharedPrefs.dart';
 import 'package:itunes_music/utility/toastMessage.dart';
 import 'package:itunes_music/view/ArtistPage/artistPage.dart';
 import 'package:itunes_music/view/SongPage/addtoPlayListWidget.dart';
-import 'package:itunes_music/viewModel/audioPlayer.dart';
 import 'package:itunes_music/viewModel/userConfig.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:text_scroll/text_scroll.dart';
-
 import '../../model/positionData.dart';
 import '../../model/song.dart';
 import '../../services/audio/audioController.dart';
@@ -42,7 +37,6 @@ class SongPage extends StatefulWidget {
 
 class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
   ///audio controller
-  //AudioPlayerVM player = Get.find<AudioPlayerVM>();
   AudioController player = Get.find<AudioController>();
 
   /// user config containes info whether the user want to autoplay
@@ -65,7 +59,6 @@ class _SongPageState extends State<SongPage> with WidgetsBindingObserver {
     if (widget.songs == null && widget.song == null) {
       throw 'Error';
     }
-    //await player.init();
     if (widget.songs != null) {
       await player.setPlayList(widget.songs!);
       await player.seek(Duration.zero, index: widget.listIndex);

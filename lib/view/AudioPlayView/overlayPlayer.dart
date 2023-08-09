@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:itunes_music/viewModel/audioPlayer.dart';
 import 'package:itunes_music/viewModel/overlayPlayerVM.dart';
 
 class OverlayPlayer extends StatefulWidget {

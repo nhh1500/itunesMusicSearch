@@ -68,7 +68,6 @@ Future init() async {
 
 ///init GetxController
 void initGetxController() {
-  //Get.put(AudioPlayerVM(), permanent: true);
   Get.put(AudioController(), permanent: true);
   Get.put(SearchModelCtr(), permanent: true);
   Get.put(SearchResultCtr(), permanent: true);
